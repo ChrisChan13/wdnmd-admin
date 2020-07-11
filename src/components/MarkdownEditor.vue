@@ -1,0 +1,266 @@
+<template>
+  <div class="markdown-editor">
+    <textarea ref="markdown" />
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, onMounted, onUnmounted } from '@vue/composition-api';
+import SimpleMDE from 'simplemde';
+import highlight from 'highlight.js';
+
+(window as any).hljs = highlight;
+
+export default defineComponent({
+  name: 'MarkdownEditor',
+  props: {
+    value: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props, ctx: any) {
+    let simplemde: any = null;
+    const methods = {
+      _initialize: () => {
+        const config = {
+          element: ctx.refs.markdown,
+          autoDownloadFontAwesome: true,
+          initialValue: props.value,
+          spellChecker: false,
+          toolbar: [
+            'bold', 'italic', 'strikethrough', 'heading',
+            '|',
+            'code', 'quote', 'unordered-list', 'ordered-list',
+            '|',
+            'link', 'image', 'table', 'horizontal-rule',
+            '|',
+            'preview', 'side-by-side', 'fullscreen', 'guide',
+          ],
+          renderingConfig: {
+            singleLineBreaks: true,
+            codeSyntaxHighlighting: true,
+          },
+        };
+        simplemde = new SimpleMDE(config);
+        const wrapper = simplemde.codemirror.getWrapperElement();
+        const preview = document.createElement('div');
+        wrapper.nextSibling.className += ' markdown-content';
+        preview.className = 'editor-preview markdown-content';
+        wrapper.appendChild(preview);
+        simplemde.codemirror.on('change', () => {
+          ctx.emit('input', simplemde.value());
+        });
+      },
+      getContent() {
+        return simplemde.options.previewRender(simplemde.value());
+      },
+    };
+    onMounted(() => {
+      methods._initialize();
+    });
+    onUnmounted(() => {
+      simplemde = null;
+    });
+    return {
+      ...methods,
+    };
+  },
+});
+</script>
+
+<style>
+@import '../../node_modules/font-awesome/css/font-awesome.min.css';
+@import '../../node_modules/simplemde/dist/simplemde.min.css';
+@import '../../node_modules/highlight.js/styles/github-gist.css';
+
+.CodeMirror {
+  height: 60vh;
+  line-height: 1.45;
+}
+
+.markdown-content * {
+  box-sizing: border-box;
+}
+
+.markdown-content {
+  margin: 0;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #24292E;
+}
+
+.markdown-content a {
+  color: #0366D6;
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content :first-child {
+  margin-top: 0;
+}
+
+.markdown-content img {
+  max-width: 100%;
+}
+
+.markdown-content > h1,
+.markdown-content > h2,
+.markdown-content > h3,
+.markdown-content > h4,
+.markdown-content > h5,
+.markdown-content > h6 {
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+  font-weight: bold;
+  color: #24292E;
+  border-bottom: 1px solid #EAECEF;
+}
+
+.markdown-content p {
+  margin-bottom: 1em
+}
+
+.markdown-content code {
+  padding: 2px 4px;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 14px;
+  color: #383e41;
+  background-color: #f3f6fa;
+  border-radius: 5px;
+}
+
+.markdown-content pre {
+  padding: 10px;
+  margin-top: 0;
+  margin-bottom: 1em;
+  font: 16px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  color: #567482;
+  word-wrap: normal;
+  background-color: #f3f6fa;
+  border: solid 1px #dce6f0;
+  border-radius: 5px;
+}
+
+.markdown-content pre > code {
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  color: #567482;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown-content .highlight {
+  margin-bottom: 1em;
+}
+
+.markdown-content .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown-content .highlight pre,
+.markdown-content pre {
+  padding: 10px;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.45;
+  border-radius: 5px;
+}
+
+.markdown-content pre code,
+.markdown-content pre tt {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-content pre code:before,
+.markdown-content pre code:after,
+.markdown-content pre tt:before,
+.markdown-content pre tt:after {
+  content: normal
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-top: 0
+}
+
+.markdown-content blockquote {
+  padding: 0 1em;
+  margin-left: 0;
+  color: #819198;
+  border-left: 5px solid #DCE6F0;
+}
+
+.markdown-content blockquote > :first-child {
+  margin-top: 0
+}
+
+.markdown-content blockquote > :last-child {
+  margin-bottom: 0
+}
+
+.markdown-content table {
+  display: block;
+  width: 100%;
+  margin-bottom: 1em;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.markdown-content table tbody tr:nth-child(2n) {
+  background: #F6F8Fa;
+}
+
+.markdown-content table th {
+  font-weight: bold
+}
+
+.markdown-content table th,
+.markdown-content table td {
+  padding: 0.5em 1em;
+  border: 1px solid #DFE2E5;
+}
+
+.markdown-content dl {
+  padding: 0
+}
+
+.markdown-content dl dt {
+  padding: 0;
+  margin-top: 1rem;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.markdown-content dl dd {
+  padding: 0;
+  margin-bottom: 1em;
+}
+
+.markdown-content hr {
+  height: 2px;
+  padding: 0;
+  margin: 1em 0;
+  background-color: #EFF0F1;
+  border: 0;
+}
+</style>
