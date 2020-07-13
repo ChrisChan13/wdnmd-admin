@@ -48,7 +48,7 @@ export const addArticle = (data) => request<any>({
   data,
 });
 
-export const getArticle = (id: string) => request({
+export const getArticle = (id: string) => request<any>({
   url: `/articles/${id}`,
   method: 'get',
 });
@@ -69,7 +69,7 @@ export const updateDraftStatus = (id: string, command: string) => request({
   method: 'post',
 });
 
-export const getDraft = (id: string) => request({
+export const getDraft = (id: string) => request<any>({
   url: `/drafts/${id}`,
   method: 'get',
 });

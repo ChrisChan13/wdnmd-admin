@@ -29,16 +29,24 @@
             v-loading="state.submitting"
             @click="_addArticle('article')"
           >发布文章</el-button>
-          <el-button v-loading="state.submitting" @click="_addArticle('draft')">保存至草稿</el-button>
+          <el-button :loading="state.submitting" @click="_addArticle('draft')">保存至草稿</el-button>
           <el-button type="danger" @click="_goBack">返回上一级</el-button>
         </template>
         <template v-else-if="state.type === 'article' && state.id">
-          <el-button type="primary" @click="_updateArticle('article')">保存修改</el-button>
+          <el-button
+            :loading="state.submitting"
+            type="primary"
+            @click="_updateArticle('article')"
+          >保存修改</el-button>
           <el-button type="danger" @click="_goBack">放弃修改</el-button>
         </template>
         <template v-else-if="state.type === 'draft' && state.id">
-          <el-button type="primary" @click="_updateArticle('draft', true)">保存并发布</el-button>
-          <el-button @click="_updateArticle('draft')">保存草稿</el-button>
+          <el-button
+            :loading="state.submitting"
+            type="primary"
+            @click="_updateArticle('draft', true)"
+          >保存并发布</el-button>
+          <el-button :loading="state.submitting" @click="_updateArticle('draft')">保存草稿</el-button>
           <el-button type="danger" @click="_goBack">放弃修改</el-button>
         </template>
         <template v-else>
